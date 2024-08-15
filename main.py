@@ -99,6 +99,7 @@ class Manager2048:
             ]:
                 self.grid[row][adjacent_col] *= 2
                 self.grid[row][col] = 0
+                return True
         if shift_y != 0:
             adjacent_row = row + shift_y
             block = self.grid[row][col]
@@ -107,6 +108,8 @@ class Manager2048:
             ]:
                 self.grid[adjacent_row][col] *= 2
                 self.grid[row][col] = 0
+                return True
+        return False
 
     def shift_blocks(self, shift_x: int, shift_y: int) -> MovementType:
         if shift_x == 0 and shift_y == 0:
@@ -125,7 +128,8 @@ class Manager2048:
                     self.grid[new_row][new_col] = block
                     self.grid[rowidx][colidx] = 0
                     blocks_moved = True
-                self.handle_merging(shift_x, shift_y, new_row, new_col)
+                if self.handle_merging(shift_x, shift_y, new_row, new_col):
+                    blocks_moved = True
         return MovementType.SHIFT_DONE if blocks_moved else MovementType.NO_SLOT
 
     def get_empty_pos(self) -> tuple[int, int]:
