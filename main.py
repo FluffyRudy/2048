@@ -79,6 +79,24 @@ class Manager2048:
             return col
         return self.get_farthest_col(shift_x, row, new_col)
 
+    def handle_merging(self, shift_x: int, shift_y: int, row: int, col: int) -> None:
+        if shift_x != 0:
+            adjacent_col = col + shift_x
+            block = self.grid[row][col]
+            if (0 <= adjacent_col < self.max_cols) and block == self.grid[row][
+                adjacent_col
+            ]:
+                self.grid[row][adjacent_col] *= 2
+                self.grid[row][col] = 0
+        if shift_y != 0:
+            adjacent_row = row + shift_y
+            block = self.grid[row][col]
+            if (0 <= adjacent_row < self.max_rows) and block == self.grid[adjacent_row][
+                col
+            ]:
+                self.grid[adjacent_row][col] *= 2
+                self.grid[row][col] = 0
+
     def shift_blocks(self, shift_x: int, shift_y: int) -> MovementType:
         if shift_x == 0 and shift_y == 0:
             return MovementType.NULL_SHIFT
@@ -96,6 +114,7 @@ class Manager2048:
                     self.grid[new_row][new_col] = block
                     self.grid[rowidx][colidx] = 0
                     blocks_moved = True
+                self.handle_merging(shift_x, shift_y, new_row, new_col)
         return MovementType.SHIFT_DONE if blocks_moved else MovementType.NO_SLOT
 
     def handle_input(self):
@@ -107,7 +126,7 @@ class Manager2048:
             shift_y = self.key_map_vertl.get(key, 0)
 
             if shift_x or shift_y:
-                self.shift_blocks(shift_x, shift_y)
+                game_state = self.shift_blocks(shift_x, shift_y)
                 self.display_table()
 
     def listen_for_exit(self, key: bytes):
