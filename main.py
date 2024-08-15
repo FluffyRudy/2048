@@ -5,7 +5,7 @@ from random import randint, choice, choices
 from blockcolors import BLOCK_COLOR, RESET_COLOR
 
 class MovementType(Enum):
-    NULL_SHIFT = auto()  # if this occur in self.make_shift, it means there exist bug
+    NULL_SHIFT = auto()
     SHIFT_DONE = auto()
     NO_SLOT = auto()
 
@@ -229,7 +229,7 @@ def generate_init_grid():
     row1, col1 = randint(0, NROWS - 1), randint(0, NCOLS - 1)
     row2, col2 = randint(0, NROWS - 1), randint(0, NCOLS - 1)
 
-    while (row1, col1) == (row2, col2):  # to ensure these two wont collide
+    while (row1, col1) == (row2, col2):  
         row2, col2 = randint(0, NROWS - 1), randint(0, NCOLS - 1)
 
     grid[row1][col1] = choice([2, 4, 8])
