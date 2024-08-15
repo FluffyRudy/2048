@@ -13,8 +13,6 @@ class Manager2048:
     def __init__(self):
         self.grid = [[0, 0, 2, 2], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 2]]
         self.max_rows, self.max_cols = len(self.grid), len(self.grid[0])
-        self.shift_x = 0
-        self.shift_y = 0
         self.isover = False
         self.key_map_vertl = {
             readchar.key.UP: -1,
@@ -33,10 +31,6 @@ class Manager2048:
             print("|" + " | ".join(map(str, row)) + "|")
         print("‾" * line_length)
 
-    def reset_shift(self):
-        self.shift_x = 0
-        self.shift_y = 0
-
     def is_valid_position(self, row: int, col: int):
         return (
             (0 <= row < self.max_rows)
@@ -47,6 +41,26 @@ class Manager2048:
     def get_block_at(self, row: int, col: int):
         return self.grid[row][col]
 
+    def get_start_stop_step(
+        self, shift_x: int, shift_y: int
+    ) -> dict[str, tuple[int, int, int]]:
+        range_params = {}
+        start_row, start_col = 0, 0
+        stop_row, stop_col = self.max_rows, self.max_cols
+        step_row, step_col = 1, 1
+        if shift_y > 0:
+            start_row = self.max_rows - 1
+            stop_row = -1
+            step_row = -1
+        print(shift_x)
+        if shift_x > 0:
+            start_col = self.max_cols - 1
+            stop_col = -1
+            step_col = -1
+        range_params["row"] = (start_row, stop_row, step_row)
+        range_params["col"] = (start_col, stop_col, step_col)
+        return range_params
+
     def get_farthest_row(self, shift_y: int, row: int, col: int) -> int:
         new_row = row + shift_y
 
@@ -56,22 +70,32 @@ class Manager2048:
             return row
         return self.get_farthest_row(shift_y, new_row, col)
 
+    def get_farthest_col(self, shift_x: int, row: int, col: int) -> int:
+        new_col = col + shift_x
+
+        if new_col >= self.max_cols or new_col < 0:
+            return col
+        if self.grid[row][new_col] != 0:
+            return col
+        return self.get_farthest_col(shift_x, row, new_col)
+
     def shift_blocks(self, shift_x: int, shift_y: int) -> MovementType:
         if shift_x == 0 and shift_y == 0:
             return MovementType.NULL_SHIFT
 
         blocks_moved = False
-        for rowidx, blockrow in enumerate(self.grid):
-            for colidx, block in enumerate(blockrow):
+        range_params = self.get_start_stop_step(shift_x, shift_y)
+        for rowidx in range(*range_params["row"]):
+            for colidx in range(*range_params["col"]):
+                block = self.grid[rowidx][colidx]
                 if block == 0:
                     continue
                 new_row = self.get_farthest_row(shift_y, rowidx, colidx)
-                new_col = colidx + shift_x
+                new_col = self.get_farthest_col(shift_x, rowidx, colidx)
                 if self.is_valid_position(new_row, new_col):
                     self.grid[new_row][new_col] = block
                     self.grid[rowidx][colidx] = 0
                     blocks_moved = True
-
         return MovementType.SHIFT_DONE if blocks_moved else MovementType.NO_SLOT
 
     def handle_input(self):
@@ -79,13 +103,12 @@ class Manager2048:
         self.listen_for_exit(key)
 
         if not self.isover:
-            self.shift_x = self.key_map_hrztl.get(key, 0)
-            self.shift_y = self.key_map_vertl.get(key, 0)
+            shift_x = self.key_map_hrztl.get(key, 0)
+            shift_y = self.key_map_vertl.get(key, 0)
 
-            if self.shift_x or self.shift_y:
-                self.shift_blocks(self.shift_x, self.shift_y)
+            if shift_x or shift_y:
+                self.shift_blocks(shift_x, shift_y)
                 self.display_table()
-                self.reset_shift()
 
     def listen_for_exit(self, key: bytes):
         is_quitting = key == "q"
