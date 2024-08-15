@@ -43,10 +43,12 @@ class Manager2048:
         print()
         print("Use the arrow keys to move: ↑ ↓ ← →")
 
+    def is_within_bound(self, row: int, col: int):
+            return (0 <= row < self.max_rows) and (0 <= col < self.max_cols)
+
     def is_valid_position(self, row: int, col: int):
         return (
-            (0 <= row < self.max_rows)
-            and (0 <= col < self.max_cols)
+            self.is_within_bound(row, col)
             and self.grid[row][col] == 0
         )
 
@@ -171,11 +173,18 @@ class Manager2048:
                 self.display_table()
 
     def is_game_over(self):
-        positions = self.get_empty_pos()
-        if len(positions) == 2:
-            row, col = positions
-            return row == -1 and col == -1
-        return False
+        for row in range(self.max_rows):
+            for col in range(self.max_cols):
+                if self.grid[row][col] == 0:
+                    return False
+                if ((self.is_within_bound(row, col+1) and self.grid[row][col+1] == self.grid[row][col]) 
+                    or (self.is_within_bound(row, col-1) and self.grid[row][col-1] == self.grid[row][col])
+                    or (self.is_within_bound(row+1, col) and self.grid[row+1][col] == self.grid[row][col])
+                    or (self.is_within_bound(row-1, col) and self.grid[row-1][col] == self.grid[row][col])
+                ):
+                    return False
+        return True
+                
 
     def replay(self):
         try:
