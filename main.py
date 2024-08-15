@@ -40,6 +40,8 @@ class Manager2048:
             print(row_str)
 
         print(f"\033[1m{'‾' * line_length}\033[0m")
+        print()
+        print("Use the arrow keys to move: ↑ ↓ ← →")
 
     def is_valid_position(self, row: int, col: int):
         return (
