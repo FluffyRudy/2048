@@ -135,10 +135,6 @@ class Manager2048:
             self.isover = True
         return self.isover
 
-    def run(self):
-        while not self.isover:
-            self.handle_input()
-
     def get_board(self) -> list[list[int]]:
         return self.grid
 
@@ -148,9 +144,13 @@ class Manager2048:
     def get_dimension(self) -> tuple[int, int]:
         return self.max_rows, self.max_cols
 
-    def clear_window(self):
+    def clear_window(self) -> None:
         if system("clear") != 0:
             system("cls")
+
+    def run(self):
+        while not self.isover:
+            self.handle_input()
 
 
 def main():
