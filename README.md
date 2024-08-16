@@ -52,6 +52,6 @@ This is a Python implementation of the popular 2048 puzzle game. The goal is to 
     Start the game by executing:
 
     ```bash
-    python game2048.py
+    python main.py
     ```
 
