@@ -32,7 +32,8 @@ class Manager2048:
         print(f"\033[1m{'_' * line_length}\033[0m")
 
         for row in self.grid:
-            print("| " + " | ".join(f"{"":^{cell_width}}" for _ in row) + " |")
+            print("| " + " | ".join(f"{{:{cell_width}}}".format("") for _ in row) + " |")
+            
             row_str = "| " + " | ".join(
                 f"{BLOCK_COLOR.get(cell, RESET_COLOR)}{cell if cell != 0 else '':^{cell_width}}{RESET_COLOR}"
                 for cell in row
@@ -42,6 +43,7 @@ class Manager2048:
         print(f"\033[1m{'‾' * line_length}\033[0m")
         print()
         print("Use the arrow keys to move: ↑ ↓ ← →")
+
 
     def is_within_bound(self, row: int, col: int):
             return (0 <= row < self.max_rows) and (0 <= col < self.max_cols)
